@@ -6,4 +6,3 @@
 var fibonacci = [1, 1, 2, 3, 5];
 // any 在数组中的应用
 var list = ['Xcat Liu', 25, { website: 'http://xcatliu.com' }];
-var list = ['Xcat Liu', 25, { website: 'http://xcatliu.com' }];

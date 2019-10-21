@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script src="./ajax.js"></script>
+</head>
+<body>
+	<button>请求数据</button>
+</body>
+<script>
+	let btn = document.getElementsByTagName('button')[0];
+	btn.onclick = function () {
+		ajax({
+			method: 'get',
+			url: 'http://localhost:3000/test'
+		})
+	}
+</script>
+</html>
