@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>发布-订阅者设计模式</title>
+</head>
+<body>
+	<h3>发布——订阅模式</h3>
+	<h5>又叫观察者模式，它定义对象间的一种【一对多的依赖关系】。当一个对象的状态发生变化，所有依赖于它的对象将得到通知。</h5>
+	<button onclick="handleListen()">订阅</button>
+	<button onclick="handleTrigger()">发布</button>
+	<button onclick="handleRemove()">删除BBA</button>
+</body>
+<script>
+	/** 全局定义一个发布者对象
+	 * 	1.记录订阅行为
+	 *	2.提供订阅方法
+	 *	3.提供触发方法
+	 *	4.提供取消订阅方法
+	 * **/
+	let Event = (function () {
+		let list = {},
+			listen,
+			trigger,
+			remove;
+			listen = function (key, fn) {
+				// 添加订阅的回调函数
+				// 每一个订阅者（订阅事件）可能存在多个触发行为（回调函数）
+				if (!list[key])
+					list[key] = [];
+				list[key].push(fn);
+			};
+			trigger = function () {
+				// 获取消息类型标识（事件名称）
+				let key = Array.prototype.shift.call(arguments);	// arguments为类数组，没有shift
+				// 触发对应的回调函数
+				let fns = list[key];
+				if (!fns || !fns.length)
+					return;
+				for (let i = 0, fn; fn = fns[i++];) {
+					fn.apply(this, arguments); // 原首个参数已被shift掉
+				}
+			};
+			remove = function (key, fn) {
+				let fns = list[key];
+				if (!fns || !fns.length)
+					return;
+				// 清空所有行为
+				if (!fn)
+					fns.length = 0;
+				else {
+					// 删除订阅者对应的回调
+					for (let i = fns.length - 1; i >= 0; i--) {
+						let _fn = fns[i];
+						_fn === fn && (fns.splice(i, 1));
+					}
+				}
+			};
+			return {
+				list,
+				listen,
+				trigger,
+				remove
+			}
+	})();
+
+	const buyBBA = custom => {
+		console.log(`${custom}要买一部轿车，豪华品牌的。`);
+	};
+
+	// 开始订阅
+	const handleListen = () => {
+		Event.listen('轿车', (custom, budget) => {
+			console.log(`${custom}要买一部轿车，预算${budget}元。`);
+		});
+		Event.listen('轿车', buyBBA);
+		Event.listen('suv', (custom, budget) => {
+			console.log(`${custom}要买一部suv，预算${budget}元。`);
+		});
+		console.log('订阅成功');
+	}
+
+	// 开始发布
+	const handleTrigger = () => {
+		Event.trigger('suv', 'toto', '30万');
+		Event.trigger('轿车', 'jacky', '35万');
+	}
+
+	const handleRemove = () => {
+		Event.remove('轿车', buyBBA)
+	}
+</script>
+</html>

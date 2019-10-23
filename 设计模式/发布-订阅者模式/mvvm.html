@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>MVVM——观察者模式</title>
+</head>
+<body>
+	<div>
+		<h3>Vue.js中发布——订阅者模式的应用</h3>
+		<div>订阅视图1：<span class="box-1"></span></div>
+		<div>订阅视图2：<span class="box-2"></span></div>
+	</div>
+</body>
+<script>
+	// 订阅器模型
+	let Dep = {
+		clientList: {},
+		listen(key, fn) {
+			if (!this.clientList[key]) {
+				this.clientList[key] = [];
+			}
+			this.clientList[key].push(fn);
+		},
+		trigger() {
+			let key = Array.prototype.shift.call(arguments);
+			let fns = this.clientList[key];
+			if (!fns || !fns.length)
+				return;
+			for (let i = 0, fn; fn = fns[i++];) {
+				fn.apply(this, arguments);
+			}
+		}
+	}
+
+	// 数据劫持
+	const dataHijack = function ({tag, data, dataKey, selector}) {
+		var value = '',
+			el = document.querySelector(selector);
+		// 劫持
+		Object.defineProperty(data, dataKey, {
+			get: function () {
+				console.log('get value');
+				return value;
+			},
+			set: function (newValue) {
+				console.log('set value');
+				value = newValue;
+				// 发布更新view
+				Dep.trigger(tag, newValue);
+			}
+		})
+		// 绑定观察者
+		Dep.listen(tag, function (text) {
+			el.innerHTML = text;
+		})
+	}
+
+	// model层 数据模型
+	let dataObj = {
+		text1: '',
+		text2: '',
+	};
+	dataHijack({
+		tag: 'view-1',	// 元素标识
+		data: dataObj,	// 数据模型
+		dataKey: 'text1',	// 持劫的key
+		selector: '.box-1'
+	});
+	dataHijack({
+		tag: 'view-2',
+		data: dataObj,
+		dataKey: 'text2',
+		selector: '.box-2'
+	});
+</script>
+</html>
