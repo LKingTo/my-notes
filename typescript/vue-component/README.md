@@ -16,3 +16,7 @@ cd application
 ```
 yarn serve
 ```
+## demo
+```
+application/src/components/HelloWorld.vue
+```
