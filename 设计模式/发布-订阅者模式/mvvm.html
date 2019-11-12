@@ -22,7 +22,7 @@
 			this.clientList[key].push(fn);
 		},
 		trigger() {
-			let key = Array.prototype.shift.call(arguments);
+			let key = Array.prototype.shift.call(arguments); // 抛出第一个参数
 			let fns = this.clientList[key];
 			if (!fns || !fns.length)
 				return;

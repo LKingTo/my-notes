@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue双向数据绑定demo</title>
+</head>
+<body>
+	<div id="app">
+		<form>
+			<input type="text" v-model="number">
+			<button type="button" v-click="increment">增加</button>
+		</form>
+		<h3 v-bind="number"></h3>
+	</div>
+	<script src="index.js"></script>
+</body>
+</html>
