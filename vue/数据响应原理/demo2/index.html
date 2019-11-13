@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue2.0 数据响应主要原理：defineProperty</title>
+</head>
+<body>
+<div id="app">
+    <div class="title">title:</div>
+    <div class="text">text:</div>
+    <div class="arr">arr: </div>
+</div>
+</body>
+<script>
+  var arrayPro = Array.prototype;
+  var arrayObj = Object.create(arrayPro);
+  var arrMethods = [
+    'push',
+    'pop',
+    'shift',
+    'unshift',
+    'splice',
+    'sort',
+    'reverse'
+  ];
+
+  function vue(data) {
+    this.$data = data;
+    this.el = document.querySelector('#app');
+    // 缺陷：defineProperty对数组无法触发更新，解决如下：
+    this.convertArray();
+    this.observe(this.$data);
+    this.render();
+  }
+
+  vue.prototype.convertArray = function () {
+    // 装饰者模式，重写数组的方法，并添加执行'触发更新'
+    var self = this;
+    arrMethods.forEach(function (method, index) {
+      arrayObj[method] = function () {
+        var ret = arrayPro[method].apply(this, arguments);
+        console.log('检验到数组变化，触发更新');
+        self.render();
+        return ret;
+      }
+    });
+  }
+
+  vue.prototype.observe = function (obj) {
+    var _value;
+    var self = this;
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        _value = obj[key];
+        if (typeof _value === "object") {
+          if (Array.isArray(_value)) {
+            _value.__proto__ = arrayObj;
+            _value.forEach(function (item) {
+              self.observe(item);
+            })
+          } else {
+            self.observe(_value);
+          }
+        } else {
+          this.convert(key, _value)
+        }
+      }
+    }
+  }
+
+  vue.prototype.convert = function (key, value) {
+    var self = this;
+    Object.defineProperty(this.$data, key, {
+      enumerable: true,
+      configurable: true,
+      get: function () {
+        return value;
+      },
+      set: function (newValue) {
+        console.log('set newValue', newValue);
+        value = newValue;
+        // 响应数据变化，触发render
+        self.render();
+      }
+    })
+  }
+
+  vue.prototype.render = function () {
+    // 试图模板分析（略），生成Virtual DOM
+    // diff算法比对（略），更新Virtual DOM
+    // 渲染视图
+    document.querySelector('.title').innerHTML = 'title: ' + this.$data.title;
+    document.querySelector('.text').innerHTML = 'text: ' + this.$data.text;
+    document.querySelector('.arr').innerHTML = 'arr: ' + this.$data.arr.join(',');
+  }
+
+  var myVue = new vue({
+    text: '',
+    title: 'vue2.0',
+    arr: [],
+  });
+
+</script>
+</html>
