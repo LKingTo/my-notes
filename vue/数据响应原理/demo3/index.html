@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue3.0 数据响应主要原理：Proxy</title>
+</head>
+<body>
+<div id="app">
+    <div class="title">title:</div>
+    <div class="text">text:</div>
+    <div class="arr">arr: </div>
+</div>
+</body>
+<script>
+  function vue(data) {
+    this.$data = data;
+    this.el = document.querySelector('#app');
+    this.observe();
+    this.render();
+  }
+
+  vue.prototype.observe = function () {
+    var self = this;
+    this.$data = new Proxy(this.$data, {
+      get: function(target, key, receiver) {
+        // console.log('get receiver', receiver)
+        return target[key];
+      },
+      set: function(target, key, newValue, receiver) {
+        // console.log('set receiver', receiver)
+        console.log('set new', newValue);
+        target[key] = newValue;
+        self.render();
+      }
+    })
+  }
+
+  vue.prototype.render = function () {
+    // 试图模板分析（略），生成Virtual DOM
+    // diff算法比对（略），更新Virtual DOM
+    // 渲染视图
+    document.querySelector('.title').innerHTML = 'title: ' + this.$data.title;
+    document.querySelector('.text').innerHTML = 'text: ' + this.$data.text;
+    document.querySelector('.arr').innerHTML = 'arr: ' + this.$data.arr.join(',');
+  }
+
+  var myVue = new vue({
+    text: '',
+    title: 'vue3.0 Proxy',
+    arr: [],
+  });
+
+</script>
+</html>

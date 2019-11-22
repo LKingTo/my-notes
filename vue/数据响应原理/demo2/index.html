@@ -56,6 +56,8 @@
           if (Array.isArray(_value)) {
             _value.__proto__ = arrayObj;
             _value.forEach(function (item) {
+              if (typeof item !== "object")
+                return;
               self.observe(item);
             })
           } else {
