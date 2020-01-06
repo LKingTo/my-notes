@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>迭代器模式</title>
+</head>
+<body>
+<h4>1.定义：指提供一种方法顺序访问一个聚合对象中的各个元素，而又不需要暴露该对象的内部表示</h4>
+<h4>2.核心：在使用迭代器模式之后，即使不关心对象的内部构造，也可以按顺序访问其中的每个元素</h4>
+</body>
+<script>
+  function each(obj, cb) {
+    var value;
+
+    if (Array.isArray(obj)) {
+      for (var i = 0; i < obj.length; ++i) {
+        // value = cb.call(obj[i], i, obj[i]);
+        value = cb.call(this, i, obj[i]);
+        if (value === false) {
+          break;
+        }
+      }
+    } else {
+      for (var i in obj) {
+        // value = cb.call(obj[i], i, obj[i]);
+        value = cb.call(this, i, obj[i]);
+        if (value === false) {
+          break;
+        }
+      }
+    }
+  }
+
+  each([1, 2, 3], function(index, value) {
+    console.log(index, value);
+  });
+
+  each({a: 1, b: 2}, function(index, value) {
+    console.log(index, value);
+  });
+
+  // 0 1
+  // 1 2
+  // 2 3
+
+  // a 1
+  // b 2
+</script>
+</html>
