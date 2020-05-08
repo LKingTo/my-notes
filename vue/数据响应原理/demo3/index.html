@@ -9,7 +9,12 @@
     <div class="title">title:</div>
     <div class="text">text:</div>
     <div class="arr">arr: </div>
+    <div class="obj">obj: </div>
+    <div class="data">data: </div>
 </div>
+<ul>
+    <li>Proxy直接代理一个数组，可以监控更新</li>
+</ul>
 </body>
 <script>
   function vue(data) {
@@ -31,6 +36,7 @@
         console.log('set new', newValue);
         target[key] = newValue;
         self.render();
+        return true;
       }
     })
   }
@@ -39,16 +45,26 @@
     // 试图模板分析（略），生成Virtual DOM
     // diff算法比对（略），更新Virtual DOM
     // 渲染视图
+    console.log('render')
     document.querySelector('.title').innerHTML = 'title: ' + this.$data.title;
     document.querySelector('.text').innerHTML = 'text: ' + this.$data.text;
-    document.querySelector('.arr').innerHTML = 'arr: ' + this.$data.arr.join(',');
+    if (this.$data.arr)
+        document.querySelector('.arr').innerHTML = 'arr: ' + this.$data.arr.join(',');
+    document.querySelector('.obj').innerHTML = 'obj: ' + JSON.stringify(this.$data.o);
+    document.querySelector('.data').innerHTML = 'data: ' + JSON.stringify(this.$data);
   }
 
-  var myVue = new vue({
+  var data = {
     text: '',
     title: 'vue3.0 Proxy',
     arr: [],
-  });
+    o: {
+      a: {name: 'tom'},
+      b: {arr: [1, 2, 3]},
+    }
+  };
+  data = [];
+  var myVue = new vue(data);
 
 </script>
 </html>

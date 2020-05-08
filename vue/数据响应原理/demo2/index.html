@@ -10,6 +10,11 @@
     <div class="text">text:</div>
     <div class="arr">arr: </div>
 </div>
+<ul>
+    <li>defineProperty无法对属性为数组类型的push、pop等api进行监控</li>
+    <li>vue通过装饰者模式，重写数组的push等方法，添加监控</li>
+    <li>vue运用defineProperty方案，需要遍历所持劫的数据对象的每一个属性</li>
+</ul>
 </body>
 <script>
   var arrayPro = Array.prototype;
@@ -83,6 +88,7 @@
         value = newValue;
         // 响应数据变化，触发render
         self.render();
+        return true;
       }
     })
   }

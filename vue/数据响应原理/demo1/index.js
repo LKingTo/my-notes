@@ -146,4 +146,23 @@
 	});
 
 	console.log(app);
+	/** app数据结构：
+	 * {
+	 *   $options: {...}
+	 *   $el: div#app,
+	 *	 $data: {number: 0},
+	 *	 $method: {
+	 *	   increment: fn()
+	 *	 },
+	 *	 _binding: {
+	 *	   number: {
+	 *	     _directives: [
+	 *	       {name, el, vm, exp, attr, update()},	// Watcher实例
+	 *	       {name, el, vm, exp, attr, update()},	// Watcher实例
+	 *	       ...
+	 *	     ]
+	 *	   }
+	 *	 }
+	 * }
+	 */
 })();
