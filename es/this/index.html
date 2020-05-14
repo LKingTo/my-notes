@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>如何正确的判断this? 箭头函数的this是什么？</title>
+</head>
+<body>
+    <pre>
+        * 默认绑定
+            * 通常为独立函数调用，fn()
+            * 不能应用其他规则是使用
+            * 严格模式 - 指向undefined
+            * 非严格模式 - 指向window
+        * 隐式绑定
+            * XXX.fn()方式调用
+            * 某个对象上触发的函数调用，存在上下文对象
+            * 绑定指向该上下文对象
+            * 注意隐式绑定丢失，变为默认绑定
+                * 回调函数
+        * 显示绑定（硬绑定）
+            * 通过call、apply、bind方式，指向第一个参数对象
+            * call、apply会执行对应的函数，bind不会
+            * 注意显示绑定丢失，变为默认绑定
+                * null、undefined传入call、apply、bind时
+        * new绑定
+            * new fn()方式调用函数
+            * new的内部操作：
+                * 创造一个新对象
+                * 将构造函数的作用域赋值给新对象（即this指向该对象）
+                * 执行构造函数中的代码
+                * 返回新对象
+
+        箭头函数：
+            * 函数体内的this对象，继承自外层代码块的this
+            * 不可当左构造函数，不能new
+            * 没有arguments对象，用rest参数替代
+            * 不能用yield命令，不能用作Generator函数
+            * 没有自己的this，即不能用call、apply、bind绑定
+
+        综合判断：
+            1. 函数是否通过new调用，是则指向新创建的对象
+            2. 是否通过call、apply、bind绑定，是则指向所绑定的对象
+            3. 函数是否在某上下文对象中调用，是则指向该上下文对象
+            4. 以上皆不是，指向默认绑定
+            5. 若call、apply、bind绑定参数为null|undefinded，指向默认绑定
+            6. 若为箭头函数，其this继承自外层代码块的this
+    </pre>
+<script src="this.js"></script>
+</body>
+</html>
