@@ -1,5 +1,6 @@
 // 组合继承
 // 结合原型链 + 借用构造函数
+// 缺点：调用了两次父类构造函数（耗内存）
 
 function Father(name){
   this.name = name;

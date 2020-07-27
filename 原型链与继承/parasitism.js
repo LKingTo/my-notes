@@ -28,7 +28,9 @@ function CreateOb(o){
 
 var p1 = CreateOb(ob);
 var p2 = CreateOb(ob);
+// ob.sayName(); // ob.sayName is not a function
 p1.sayName(); // xiaopao
 p1.friends.push('p1');
-console.log(p1.friends); //
-console.log(p2.friends);
+console.log(p1.friends); // ["lulu", "huahua", "p1"]
+console.log(p2.friends); // ["lulu", "huahua", "p1"]
+console.log(ob.friends); // ["lulu", "huahua", "p1"]
