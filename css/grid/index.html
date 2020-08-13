@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grid布局（网格布局）</title>
+</head>
+<body>
+    <div class="container">
+        <div class="item item-1" style="background: #42b983"><span class="content">1</span></div>
+        <div class="item item-2" style="background: #2d85b9"><span class="content">2</span></div>
+        <div class="item item-3" style="background: #b9596e"><span class="content">3</span></div>
+        <div class="item item-4" style="background: #b9b789"><span class="content">4</span></div>
+        <div class="item item-5" style="background: #b97916"><span class="content">5</span></div>
+        <div class="item item-6" style="background: #170db9"><span class="content">6</span></div>
+        <div class="item item-7" style="background: #b91c2e"><span class="content">7</span></div>
+        <div class="item item-8" style="background: #b9b80a"><span class="content">8</span></div>
+        <div class="item item-9" style="background: #00b92f"><span class="content">9</span></div>
+    </div>
+</body>
+<style>
+    .container {
+        width: 100%;
+        height: 600px;
+        /*display: grid;*/
+        display: inline-grid;
+        /*grid-template-columns: 100px 100px 100px;*/
+        /*grid-template-rows: 100px 100px 100px;*/
+        /*grid-template-columns: 33.33% 33.33% 33.33%;*/
+        /*grid-template-rows: 33.33% 33.33% 33.33%;*/
+
+        /*重复参数*/
+        /*grid-template-columns: repeat(3, 33.33%);*/
+        /*grid-template-rows: repeat(3, 33.33%);*/
+
+        /*重复模式*/
+        /*grid-template-columns: repeat(2, 100px 20px 80px);*/
+        /*grid-template-columns: repeat(auto-fill, 100px);*/
+        /*grid-template-rows: repeat(auto-fill, 100px);*/
+
+        /*fr*/
+        /*grid-template-columns: 1fr 2fr;*/
+        /*grid-template-rows: 1fr 1fr;*/
+        /*grid-template-columns: 150px 1fr 2fr;*/
+
+        /*minmax*/
+        /*grid-template-columns: 1fr 1fr minmax(100px, 1.5fr);*/
+
+        /*auto*/
+        /*grid-template-columns: 100px auto 100px;*/
+
+        /*定义网格线名称*/
+        /*grid-template-columns: [c1] 100px [c2] 100px [c3] auto [c4];*/
+        /*grid-template-rows: [r1] 100px [r2] 100px [r3] auto [r4];*/
+
+        /*grid-template-columns: 70% 30%;*/
+        /*grid-template-columns: repeat(12, 1fr);*/
+
+        /*grid-template-columns: repeat(3, 1fr);*/
+        /*grid-row-gap: 20px;*/
+        /*grid-column-gap: 20px;*/
+        /*grid-gap: 30px 20px;*/
+        /*grid-gap: 5%;*/
+
+        /*grid-template-columns: 100px 100px 100px;*/
+        /*grid-template-rows: 100px 100px 100px;*/
+        grid-template-areas: 'a b c' 'd e f' 'g h i';
+        /*grid-template-areas: 'a a a' 'b b b' 'c c c';*/
+        /*grid-template-areas: 'a . c' 'd . f' 'g . i';*/
+
+        grid-template-columns: 100px 100px 100px;
+        grid-template-rows: 100px 100px 100px;
+        /*grid-template-areas: 'a . ' 'b c' 'd e f' 'g h i';*/
+
+        /*先列后行*/
+        /*grid-auto-flow: column;*/
+        /*先行后列*/
+        /*grid-auto-flow: row;*/
+        /*grid-auto-flow: row dense;*/
+        /*grid-auto-flow: column dense;*/
+
+        /*项目位置*/
+        /*justify-items: start;*/
+        /*justify-items: end;*/
+        /*justify-items: center;*/
+        /*justify-items: stretch;*/
+
+        /*align-items: start;*/
+        /*align-items: end;*/
+        /*align-items: center;*/
+        /*align-items: stretch;*/
+
+        /*place-items: start end;*/
+
+        /*容器位置*/
+        /*justify-content: start;*/
+        /*justify-content: end;*/
+        /*justify-content: center;*/
+        /*justify-content: stretch;*/
+        /*justify-content: space-around;*/
+        /*justify-content: space-between;*/
+        /*justify-content: space-evenly;*/
+
+        /*align-content: start;*/
+        /*align-content: end;*/
+        /*align-content: center;*/
+        /*align-content: stretch;*/
+        /*align-content: space-around;*/
+        /*align-content: space-between;*/
+        /*align-content: space-evenly;*/
+
+        /*place-content: space-around space-evenly;*/
+
+        /*grid-template-columns: 100px 100px 100px;*/
+        /*grid-template-rows: 100px 100px 100px;*/
+        /*grid-auto-rows: 50px;*/
+    }
+    .item-1 {
+        /*指定起始网格线*/
+        grid-column-start: 2;
+        grid-column-end: 4;
+        grid-row-start: 2;
+        grid-row-end: 4;
+    }
+    .item-2 {
+        grid-column-start: span 2;
+    }
+    .item-3 {
+        grid-column: 1 / 3;
+        grid-row: 1 / 2;
+        z-index: 1;
+    }
+    .item-4 {
+        /*指定区域*/
+        grid-area: g;
+    }
+    .item-5 {
+        /*grid-area: <row-start> / <column-start> / <row-end> / <column-end>;*/
+        grid-area: 1 / 1 / 3 / 3;
+    }
+    .item-6 {
+        justify-self: center;
+        align-self: center;
+        place-self: center;
+    }
+</style>
+</html>
