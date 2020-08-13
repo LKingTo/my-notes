@@ -1,4 +1,8 @@
 /** 函数的类型 **/
+let myFun: (x:number, y: number) => number;
+myFun = (x, y) => {return x + y;};
+let aa = myFun(2,3);
+
 // 声明式
 function sum(x: number, y: number): number { //输出规定number类型
     return x + y;

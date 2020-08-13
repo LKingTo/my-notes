@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello React!</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+    const name = 'toto';
+    const props = {foo: 'foo', bar: 'bar'};
+    const innerHtml = '<div>inner</div>';
+    // const h1 = <h1 data-name={name} {...props} dangerouslySetInnerHTML={{__html:innerHtml}}>hello react!</h1>;
+    const h1 = <h1 data-name={name} {...props} dangerouslySetInnerHTML={{__html:innerHtml}}/>;
+      ReactDOM.render(
+      // <h1 data-name={name} {...props}>hello react!</h1>,
+      h1,
+      document.getElementById('example')
+    )
+    console.log(h1.props)
+</script>
+</body>
+</html>

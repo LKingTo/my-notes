@@ -1,4 +1,7 @@
 /** 函数的类型 **/
+var myFun;
+myFun = function (x, y) { return x + y; };
+var aa = myFun(2, 3);
 // 声明式
 function sum(x, y) {
     return x + y;
