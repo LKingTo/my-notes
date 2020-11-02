@@ -1,4 +1,4 @@
-import * as tslib_1 from "tslib";
+import { __decorate } from "tslib";
 // mixins.ts,定义vue/type/vue模块,实现Vue接口
 import { Vue, Component } from 'vue-property-decorator';
 let myMixins = class myMixins extends Vue {
@@ -7,7 +7,7 @@ let myMixins = class myMixins extends Vue {
         this.globalVal = '全局混合属性';
     }
 };
-myMixins = tslib_1.__decorate([
+myMixins = __decorate([
     Component
 ], myMixins);
 export default myMixins;
