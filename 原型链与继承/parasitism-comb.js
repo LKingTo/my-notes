@@ -14,6 +14,9 @@ function Child(name,age){
   Parent.call(this,name);
   this.age = age;
 }
+Child.prototype.childFn = function() {
+  console.log(this.age)
+}
 
 // Child.prototype = new Parent(); // 原型链方式换成下面
 function prototype(child,parent){
@@ -29,3 +32,4 @@ child1.colors.push('pink')
 var child2 = new Child('xiao', 28);
 console.log(child1.colors); // ["red", "blue", "green", "pink"]
 console.log(child2.colors); // ["red", "blue", "green"]
+// child1.childFn()    // 子类原型被覆盖，undefined
