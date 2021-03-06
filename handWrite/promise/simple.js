@@ -52,7 +52,9 @@ xPromise.prototype.then = function(onResolved, onRejected) {
 }
 
 const p = new xPromise(function(resolve, reject) {
-  resolve('success')
+  // setTimeout(() => { // 异步未支持
+    resolve('success')
+  // })
 })
 p.then(function (res) {
   console.log(res)  // success
@@ -64,7 +66,8 @@ const pp = new xPromise(function(resolve, reject) {
   }))
 })
 pp.then(function (res) {
+  console.log(res)  // xPromise {reason: undefined,status: "resolved",value: "ss"}
   res.then(function (r) {
-    console.log(r)
+    console.log(r)  // ss
   })
 })

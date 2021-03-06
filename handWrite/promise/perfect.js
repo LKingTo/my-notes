@@ -16,17 +16,19 @@ function myPromise(executor) {
   self.status = PENDING
   self.value = undefined
   self.reason = undefined
-  self.onFullfilledArray = []
+  self.onFullfilledArray = []  // 为什么是数组？可能有多个.then
   self.onRejectedArray = []
+
   function resolve(value) {
-    setTimeout(() => {
-      if (self.status === PENDING) {
+    setTimeout(() => {  // 为什么要延时？保证then的回调被订阅后才执行resolve，事件循环机制
+      if (self.status === PENDING) {  // 为什么要判断状态？状态一旦改变不能再变
         self.status = FULFILLED
         self.value = value
         self.onFullfilledArray.forEach(fn => fn(self.value))
       }
     })
   }
+
   function reject(reason) {
     setTimeout(() => {
       if (self.status === PENDING) {
@@ -36,63 +38,63 @@ function myPromise(executor) {
       }
     })
   }
+
   try {
     executor(resolve, reject)
-  } catch(e) {
+  } catch (e) {  // 执行器执行期间任何异常都用reject处理
     reject(e)
   }
 }
-myPromise.prototype.then = function(onFulfilled, onRejected) {
+
+myPromise.prototype.then = function (onFulfilled, onRejected) {
   onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value
-  onRejected = typeof onRejected === 'function' ? onRejected : reason => {throw reason}
+  onRejected = typeof onRejected === 'function' ? onRejected : reason => {
+    throw reason
+  }
   let self = this
   let newPromise
+
+  function handleOnFulfilled(onFulfilled, newPromise, value, resolve, reject) {
+    setTimeout(() => {
+      try {
+        let newResolveValue = onFulfilled(value)  // 新promise的value
+        resolvePromise(newPromise, newResolveValue, resolve, reject)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  function handleOnRejected(onRejected, newPromise, reason, resolve, reject) {
+    setTimeout(() => {
+      try {
+        let newRejectReason = onRejected(reason) // 新promise的reason
+        resolvePromise(newPromise, newRejectReason, resolve, reject)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
   switch (self.status) {
     case FULFILLED:
+      // 为什么返回一个新Promise？为了.then的链式调用
       newPromise = new myPromise((resolve, reject) => {
-        setTimeout(() => {
-          try {
-            let temple = onFulfilled(self.value)
-            resolvePromise(newPromise, temple, resolve, reject)
-          } catch (e) {
-            reject(e)
-          }
-        })
+        handleOnFulfilled(onFulfilled, newPromise, self.value, resolve, reject)
       })
       break
     case REJECTED:
       newPromise = new myPromise((resolve, reject) => {
-        setTimeout(() => {
-          try {
-            let temple = onRejected(self.reason)
-            resolvePromise(newPromise, temple, resolve, reject)
-          } catch (e) {
-            reject(e)
-          }
-        })
+        handleOnRejected(onRejected, newPromise, self.reason, resolve, reject)
       })
       break
     case PENDING:
       newPromise = new myPromise((resolve, reject) => {
         self.onFullfilledArray.push(value => {
-          setTimeout(() => {
-            try {
-              let temple = onFulfilled(value)
-              resolvePromise(newPromise, temple, resolve, reject)
-            } catch (e) {
-              reject(e)
-            }
-          })
+          handleOnFulfilled(onFulfilled, newPromise, value, resolve, reject)
         })
         self.onRejectedArray.push(reason => {
-          setTimeout(() => {
-            try {
-              let temple = onRejected(reason)
-              resolvePromise(newPromise, temple, resolve, reject)
-            } catch (e) {
-              reject(e)
-            }
-          })
+          handleOnRejected(onRejected, newPromise, reason, resolve, reject)
         })
       })
       break
@@ -101,27 +103,37 @@ myPromise.prototype.then = function(onFulfilled, onRejected) {
   return newPromise
 }
 
-// 处理onFulfilled或onRejected返回值的情况，修改promise的状态值
-function resolvePromise(promise, x, resolve, reject) {
-  if (promise === x) {
+/**
+ * 处理上一个then函数onFulfilled或onRejected返回值的情况，修改新promise的状态值
+ * @param promise     then函数返回的新promise对象
+ * @param returnValue then函数onFulfilled或onRejected的函数返回值
+ * @param resolve     新promise的内部resolve
+ * @param reject      新promise的内部reject
+ * @returns {*}
+ */
+function resolvePromise(promise, returnValue, resolve, reject) {
+  if (promise === returnValue) {
     return reject(new TypeError('cycle reference'))
   }
   let isUsed  // isUsed有什么用？
-  if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
+  if (returnValue !== null && (typeof returnValue === 'object' || typeof returnValue === 'function')) {
     try {
-      let then = x.then
-      if (typeof then === 'function') { // x是一个promise实例
-        then.call(x, y => {
+      let then = returnValue.then
+      if (typeof then === 'function') {
+        // 若returnValue是一个promise实例，
+        // 需执行完其内部的then链，才能修改value
+        then.call(returnValue, innerValue => {
           if (isUsed) return
           isUsed = true
-          resolvePromise(promise, y, resolve, reject)
-        }, e => {
+          resolvePromise(promise, innerValue, resolve, reject)
+        }, innerReason => {
           if (isUsed) return
           isUsed = true
-          reject(e)
+          reject(innerReason)
         })
       } else {
-        resolve(x)
+        // 若returnValue只是一个普通object，直接修改value
+        resolve(returnValue)
       }
     } catch (e) {
       if (isUsed) return
@@ -129,7 +141,7 @@ function resolvePromise(promise, x, resolve, reject) {
       reject(e)
     }
   } else {
-    resolve(x)
+    resolve(returnValue)
   }
 }
 
@@ -138,7 +150,9 @@ const customPromise = myPromise
 // const customPromise = Promise
 
 const p = new customPromise((resolve, rejected) => {
-  const p2 = new customPromise((resolve, rejected) => {resolve(2)})
+  const p2 = new customPromise((resolve, rejected) => {
+    resolve(2)
+  })
   resolve(p2)
 })
 p.then(res => {
@@ -155,5 +169,5 @@ p.then(res => {
     })
 })
   .then(res => {
-  console.log(res)  // 55
-})
+    console.log(res)  // 55
+  })

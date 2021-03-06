@@ -5,7 +5,10 @@
 
 function promiseAll(promises) {
   if (!Array.isArray(promises)) {
-    return Promise.reject(new TypeError('args is not iteratable'))
+    return Promise.reject(new TypeError('args is not iterable'))
+  }
+  if (promises.length === 0) {
+    return Promise.resolve(promises)
   }
   const resolveArray = []
   let resolveNumber = 0
@@ -25,9 +28,9 @@ function promiseAll(promises) {
 }
 
 promiseAll([
-  new Promise((resolve, reject) => { setTimeout(() => { resolve(1000) }, 1000) }),
-  new Promise((resolve, reject) => { setTimeout(() => { resolve(200) }, 200) }),
-  new Promise((resolve, reject) => { setTimeout(() => { resolve(100) }, 100) })
+  // new Promise((resolve, reject) => { setTimeout(() => { resolve(1000) }, 1000) }),
+  // new Promise((resolve, reject) => { setTimeout(() => { resolve(200) }, 200) }),
+  // new Promise((resolve, reject) => { setTimeout(() => { resolve(100) }, 100) })
 ]).then((data) => {
   console.log('success', data);
 }, (err) => {

@@ -9,6 +9,7 @@ function promiseRace(promises) {
     if (!Array.isArray(promises)) {
       return Promise.reject(new TypeError('args is not iteratable'))
     } else {
+      // promises为空数组不用处理，让Promise实例一只处于pending状态
       for (let i = 0; i < promises.length; i++) {
         Promise.resolve(promises[i]).then(data => {
           resolve(data)   // promise状态一旦改变，无法再变，执行慢的无效
