@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>usePrevious</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  // usePrevious：setCount(count => count + 1)后输出上一次count的值
+
+  const {useState, useEffect, useRef} = React
+
+  const usePrevious = (initState) => {
+    const [state, _setState] = useState(initState)
+    const previousState = useRef(initState)
+    const setState = (state) => {
+      _setState(prev => {
+        previousState.current = prev
+        return typeof state === 'function' ? state(prev) : state
+      })
+    }
+    useEffect(() => {
+      console.log('previous: ', previousState.current)
+    }, [state])
+
+    return [previousState.current, state, setState]
+  }
+
+  const App = () => {
+    const [prevState, state, setCount] = usePrevious(0)
+
+    return (
+      <div>
+        current: {state}<br/>
+        previous: {prevState}<br/>
+        <button onClick={() => setCount(prev => prev + 1)}>add</button>
+      </div>
+    )
+  }
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

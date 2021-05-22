@@ -9,7 +9,7 @@
 </body>
 <!--<script src="simple.js"></script>-->
 <!--<script src="perfect.js"></script>-->
-<script src="perfect_class.js"></script>
+<!--<script src="perfect_class.js"></script>-->
 <!--<script src="race.js"></script>-->
 <!--<script src="all.js"></script>-->
 <!--<script src="finally.js"></script>-->
@@ -29,5 +29,110 @@
   // }, err => {
   //   console.log(err)
   // })
+
+  const FULFILLED = 'fulfilled'
+  const REJECTED = 'rejected'
+  const PENDING = 'pending'
+
+  class nPromise {
+    status = PENDING
+    value = undefined
+    onFulfilledArray = []
+    onRejectedArray = []
+
+    constructor(executor) {
+      try {
+        executor(this._resolve.bind(this), this._reject.bind(this))
+      } catch (e) {
+        this._reject.bind(this, e)
+      }
+    }
+
+    _resolve(value) {
+      setTimeout(() => {
+        if (this.status === PENDING) {
+          this.status = FULFILLED
+          this.value = value
+          this.onFulfilledArray.push(fn => fn(value))
+        }
+      })
+    }
+
+    _reject(reason) {
+      setTimeout(() => {
+        if (this.status === PENDING) {
+          this.status = REJECTED
+          this.value = reason
+          this.onRejectedArray.push(fn => fn(reason))
+        }
+      })
+    }
+
+    then(onResolve, onRejected) {
+      onResolve = typeof onResolve === 'function' ? onResolve : value => value
+      onRejected = typeof onRejected === 'function' ? onRejected : reason => {throw reason}
+
+      const self = this
+      let newPromise
+      switch(self.status) {
+        case FULFILLED:
+          newPromise = new nPromise((newResolve, newReject) => {
+            self._handleResolve(onResolve, self.value, newResolve, newReject)
+          })
+          break
+        case REJECTED:
+          newPromise = new nPromise((newResolve, newReject) => {
+            self._handleResolve(onRejected, self.value, newResolve, newReject)
+          })
+          break
+        case PENDING:
+          newPromise = new nPromise((newResolve, newReject) => {
+            self.onFulfilledArray.push(value => {
+              self._handleResolve(onResolve, value, newResolve, newReject)
+            })
+            self.onRejectedArray.push(reason => {
+              self._handleResolve(onRejected, reason, newResolve, newReject)
+            })
+          })
+          break
+        default:
+      }
+      return newPromise
+    }
+
+    _handleResolve(handler, selfValue, newResolve, newReject) {
+      setTimeout(() => {
+        try {
+          const newResolveValue = handler(selfValue)
+          this._handleNewPromise(newResolveValue, newResolve, newReject)
+        } catch (e) {
+          newReject(e)
+        }
+      })
+    }
+
+    _handleNewPromise(value, resolve, reject) {
+      const self = this
+      if (value !== null && (typeof value === 'object' || typeof value === 'function')) {
+        const then = value.then
+        if (typeof then === 'function') {
+          try {
+            then.call(value, innerValue => {
+              self._handleNewPromise(innerValue, resolve, reject)
+            }, innerReason => {
+              self._handleNewPromise(innerReason, resolve, reject)
+            })
+          } catch (e) {
+            reject(e)
+          }
+        } else {
+          resolve(value)
+        }
+      } else {
+        resolve(value)
+      }
+    }
+  }
+
 </script>
 </html>

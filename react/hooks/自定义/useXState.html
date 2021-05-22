@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>useXState</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  // 自定义useXState，带有回调函数执行功能，setState接受第二参数callback
+
+  const {useState, useEffect, useRef} = React
+
+  /**
+   *
+   * @param initState
+   * @returns {[*, setXState]}
+   */
+  const useXState = (initState) => {
+    const [state, setState] = useState(initState)
+    const isUpdate = useRef()
+
+    const setXState = (state, cb) => {
+      setState(prev => {
+        isUpdate.current = cb
+        return typeof state === 'function' ? state(prev) : state
+      })
+    }
+    useEffect(() => {
+      if (isUpdate.current) {
+        isUpdate.current()
+      }
+    }, [state])
+
+    return [state, setXState]
+  }
+
+  const App = () => {
+    const [count, setXState] = useXState(0)
+    const countRef = useRef('count')
+    countRef.current = count
+    const cb = () => {
+      setTimeout(() => {
+        console.log(`after add count: ${countRef.current}`)
+      }, 300)
+    }
+    return (
+      <div className="App">
+        <h3>Count: {count}</h3>
+        <button onClick={() => setXState(prev => prev + 1, cb)}>add count</button>
+      </div>
+    );
+  }
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

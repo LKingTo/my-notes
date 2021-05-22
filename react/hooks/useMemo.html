@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>useCallback</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  const {useState, useMemo} = React
+  const App = () => {
+    const [count, setCount] = useState(0);
+    const [total, setTotal] = useState(0);
+
+    // 没有使用 useMemo，即使是更新 total, countToString 也会重新计算
+    const countToString = (() => {
+      console.log("countToString 被调用");
+      return count.toString();
+    })();
+
+    // 使用了 useMemo, 只有 total 改变，才会重新计算
+    const totalToStringByMemo = useMemo(() => {
+      console.log("totalToStringByMemo 被调用");
+      return total + "";
+    }, [total]);
+
+    return (
+      <div className="App">
+        <h3>countToString: {countToString}</h3>
+        <h3>countToString: {totalToStringByMemo}</h3>
+        <button
+          onClick={() => {
+            setCount((count) => count + 1);
+          }}
+        >
+          Add Count
+        </button>
+        <br />
+        <button
+          onClick={() => {
+            setTotal((total) => total + 1);
+          }}
+        >
+          Add Total
+        </button>
+      </div>
+    );
+  }
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

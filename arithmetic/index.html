@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arithmetic</title>
+</head>
+<body>
+<script src="increasingSubsequeue.js"></script>
+<script>
+  /** 斐波那契数列 */
+  function fibonacci(n) {
+    if (n === 0 || n === 1) return n
+    return fibonacci(n - 2) + fibonacci(n - 1)
+  }
+
+  function Fibonacci(n) {
+    if (n === 0 || n === 1) return n
+    let a = 0, b = 1, c;
+    for (let i = 2; i <= n; i++) {
+      c = a + b;
+      a = b;
+      b = c;
+    }
+    return c;
+  }
+  // console.log(fibonacci(10)) // 55
+  // console.log(Fibonacci(10)) // 55
+
+  /** 跳台阶：一只青蛙可以跳上1级或2级台阶，求青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）
+   *  分析：
+   *  假设第一次跳的是一级，剩下的n-1级，跳法是f(n-1)
+   *  假设第一次跳的是两级，剩下的n-2级，跳法是f(n-2)
+   *  由上所得：f(n) = f(n-1) + f(n-2)
+   *  实际可知：f(1) = 1，f(2) = 2
+   *  最终得出是一个斐波那契数列：
+   *  f(n) | 1, n=1; | 2, n=2 | f(n-1) + f(n-2), n > 2
+   */
+// 递归方法实现：最低级的做法，很多重复计算，效率很低
+  function jumpFloor(n) {
+    if (n <= 0) return 0;
+    if (n <= 2) return n;
+    return jumpFloor(n - 1) + jumpFloor(n - 2);
+  }
+
+  // 动态规则实现：从下往上算斐波那契，避免冲计算，提高效率
+  function jumpFloor1(n) {
+    if (n <= 2) return n
+    let f = 1;
+    let g = 1;
+    while (n--) {
+      g = g + f;
+      f = g - f;
+      //n=5, g=1+1=2, f=2-1=1
+      //n=4, g=2+1=3, f=3-1=2
+      //n=3, g=3+2=5, f=5-2=3
+      //n=2, g=5+3=8, f=8-3=5
+      //n=1, g=8+5=13, f=13-5=8
+    }
+    return f;
+  }
+
+  // console.log(jumpFloor(5))  //8
+  // console.log(jumpFloor1(5))
+
+  /** 判断一个单词是否是回文？例：mamam */
+  function tenet(str) {
+    return str === str.split('').reverse().join('')
+  }
+
+  // console.log(tenet('tenet'))
+  // console.log(tenet('abcde'))
+
+  /** 统计一个字符串出现最多的字母 */
+  function findMaxDuplicateChar(str) {
+    if (str.length === 1) return str;
+    let map = {};
+    let max = 0;
+    // 先统计各字符出现次数，并记录最大值
+    for (let i = 0; i < str.length; i++) {
+      let char = str[i]
+      if (!map[char])
+        map[char] = 1;
+      else
+        map[char]++;
+      max = map[char] > max ? map[char] : max;
+    }
+    // 再筛选key值为最大值的字符，可能为多个
+    let maxChars = Object.keys(map).filter(k => map[k] === max)
+    return maxChars.join('、')
+  }
+
+  // console.log(findMaxDuplicateChar('ssasdaaabwbbwrb')) // a、b
+
+  /** 排序算法 */
+// 快速排序：算法参考某个元素值，将小于它的值，放到左数组中，大于它的值的元素就放到右数组中，
+// 然后递归进行上一次左右数组的操作，返回合并的数组就是已经排好顺序的数组
+  function quickSort(arr) {
+    console.log('arr', arr)
+    if (arr.length <= 1) {
+      return arr;
+    }
+    let leftArr = [];
+    let rightArr = [];
+    let q = arr[0];
+    for (let i = 1, l = arr.length; i < l; i++) {
+      if (arr[i] > q) {
+        rightArr.push(arr[i]);
+      } else {
+        leftArr.push(arr[i]);
+      }
+    }
+    return [].concat(quickSort(leftArr), [q], quickSort(rightArr));
+  }
+
+  // 505,[226,248,62],[908,691,766,862,794,706] =>                      总：fn([?]),[505],fn([?])
+  // 226,[62],[248] => [62],[226],[248] => [62,226,248]                 总：[62,226,248],[505],fn([?])
+  // 908,[691,766,862,794,706] [] => [691,766,862,794,706],[908],[]     总：[62,226,248],[505],fn([?]),[908]
+  // 691,[766,862,794,706], [] => , [], [691], [766,862,794,706]        总：[62,226,248],[505],[691],fn([?]),[908]
+  // 766,[706],[862,794] => [706],[766],[862,794]                       总：[62,226,248],[505],[691],[706],[766],fn([?]),[908]
+  // 862,[794],[] => [794],[862],[]                                     总：[62,226,248],[505],[691],[706],[766],[794],[862],[908]
+
+  // console.log(quickSort([505, 908, 226, 248, 691, 766, 862, 62, 794, 706]))
+
+
+  /** 不借助临时变量，进行两个整数的交换 */
+  function swap(a, b) {
+    b = b - a;  // b=5-3=2
+    a = a + b;  // a=3+2=5
+    b = a - b;  // b=5-2=3
+    return [a, b]
+  }
+  // console.log('swap', swap(3, 5))
+
+
+  /** 实现一个算法，随机生成指定长度的字符串 */
+  function randomStr(n) {
+    let str = 'abcdefghijklmnopqrstuvwxyz9876543210';
+    let tmp = '', l = str.length;
+    for (let i = 0; i < n; i++) {
+      tmp += str.charAt(Math.floor(Math.random() * l));
+    }
+    return tmp;
+  }
+
+  // console.log('randomStr', randomStr(8))
+
+
+  /** 实现类似getElementsByClassName 的功能 */
+  // 自己实现一个函数，查找某个DOM节点下面的包含某个class的所有DOM节点？
+  // 不允许使用原生提供的 getElementsByClassName querySelectorAll 等原生提供DOM查找函数。
+  function queryClassName(node, name) {
+    var starts = '(^|[ \n\r\t\f])',
+      ends = '([ \n\r\t\f]|$)';
+    var array = [],
+      regex = new RegExp(starts + name + ends),
+      elements = node.getElementsByTagName("*"),
+      length = elements.length,
+      i = 0,
+      element;
+
+    while (i < length) {
+      element = elements[i];
+      if (regex.test(element.className)) {
+        array.push(element);
+      }
+
+      i += 1;
+    }
+
+    return array;
+  }
+
+
+  /** 使用js实现二叉查找树(Binary Search Tree) */
+  class Node {
+    constructor(data, left, right) {
+      this.data = data;
+      this.left = left;
+      this.right = right;
+    }
+
+  }
+  class BinarySearchTree {
+
+    constructor() {
+      this.root = null;
+    }
+
+    insert(data) {
+      let n = new Node(data, null, null);
+      if (!this.root) {
+        return this.root = n;
+      }
+      let currentNode = this.root;
+      let parent = null;
+      while (1) {
+        parent = currentNode;
+        if (data < currentNode.data) {
+          currentNode = currentNode.left;
+          if (currentNode === null) {
+            parent.left = n;
+            break;
+          }
+        } else {
+          currentNode = currentNode.right;
+          if (currentNode === null) {
+            parent.right = n;
+            break;
+          }
+        }
+      }
+    }
+
+    remove(data) {
+      this.root = this.removeNode(this.root, data)
+    }
+
+    removeNode(node, data) {
+      if (node == null) {
+        return null;
+      }
+
+      if (data == node.data) {
+        // no children node
+        if (node.left == null && node.right == null) {
+          return null;
+        }
+        if (node.left == null) {
+          return node.right;
+        }
+        if (node.right == null) {
+          return node.left;
+        }
+
+        let getSmallest = function(node) {
+          if(node.left === null && node.right == null) {
+            return node;
+          }
+          if(node.left != null) {
+            return node.left;
+          }
+          if(node.right !== null) {
+            return getSmallest(node.right);
+          }
+
+        }
+        let temNode = getSmallest(node.right);
+        node.data = temNode.data;
+        node.right = this.removeNode(temNode.right,temNode.data);
+        return node;
+
+      } else if (data < node.data) {
+        node.left = this.removeNode(node.left,data);
+        return node;
+      } else {
+        node.right = this.removeNode(node.right,data);
+        return node;
+      }
+    }
+
+    find(data) {
+      var current = this.root;
+      while (current != null) {
+        if (data == current.data) {
+          break;
+        }
+        if (data < current.data) {
+          current = current.left;
+        } else {
+          current = current.right
+        }
+      }
+      return current.data;
+    }
+
+  }
+</script>
+</body>
+</html>

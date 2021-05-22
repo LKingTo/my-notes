@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>web worker</title>
+    <a href="http://www.ruanyifeng.com/blog/2018/07/web-worker.html">Web Worker 使用教程</a>
+</head>
+<body>
+<script id="worker" type="app/worker">
+    const self = this;
+    let timer;
+    self.addEventListener('message', function (e) {
+        const {cmd, msg} = e.data;
+        switch (cmd) {
+            case 'start':
+                self.postMessage({cmd: 'WORKER IS POLLING', time: new Date()});
+                break;
+            case 'stop':
+                self.postMessage({cmd: 'WORKER STOPPED', time: new Date()});
+                self.close()    // 子线程关闭自身
+                break;
+            default:
+        };
+    }, false);
+</script>
+<script>
+  function createWorker(el) {
+    // 创建一个同页面的web worker
+    const blob = new Blob([document.querySelector(el).textContent]);
+    const url = window.URL.createObjectURL(blob);
+    return new Worker(url);
+  }
+
+  const pollingWorker = createWorker('#worker');
+  let startTs = new Date().getTime();
+  const timer = setInterval(() => {
+    pollingWorker.postMessage({cmd: 'start'})
+  }, 1000)
+  pollingWorker.onmessage = e => {
+    const {cmd, time} = e.data;
+    console.log('[now:]', time, time.getTime() - startTs)
+    if (cmd === 'WORKER IS POLLING') {
+      if (time.getTime() - startTs >= 15000) {
+        clearInterval(timer)
+        pollingWorker.postMessage({cmd: 'stop'})
+        pollingWorker.terminate();  // 主线程终止worker
+      }
+    }
+  }
+</script>
+</body>
+</html>

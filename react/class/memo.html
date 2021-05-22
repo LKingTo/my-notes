@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MemoComponent</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  const {Component, memo} = React
+
+  class Parent extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {count: 0, o: {age: 1}, arr: [1]}
+      this.addCount = this.addCount.bind(this)
+      this.addAge = this.addAge.bind(this)
+      this.addArr = this.addArr.bind(this)
+    }
+
+    addCount() {
+      this.setState(prevS => {
+        return {
+          ...prevS,
+          count: prevS.count + 1
+        }
+      })
+    }
+
+    addAge() {
+      this.setState(prev => {
+        prev.o.age += 1
+        return {
+          ...prev,
+          // o: {  // 新旧引用不一样，子组件的浅比较返回false
+          //   age: prev.o.age + 1
+          // }
+          o: prev.o // 新旧引用一样，子组件的浅比较返回true
+        }
+      })
+    }
+
+    addArr() {
+      this.setState(prev => {
+        const arr = prev.arr
+        arr.push(1)
+        return {
+          ...prev,
+          arr: arr   // 新旧引用一样，子组件的浅比较返回true
+          // arr: [...arr] // 新旧引用不一样，子组件的浅比较返回false
+        }
+      })
+    }
+
+    render() {
+      const {count, o, arr} = this.state
+      return (
+        <div>
+          <div>count: {count} | age: {o.age} | arr: {JSON.stringify(arr)}</div>
+          <div>
+            <button onClick={this.addCount}>addCount</button>
+            <button onClick={this.addAge}>addAge</button>
+            <button onClick={this.addArr}>addArr</button>
+          </div>
+          <Child count={this.state.count} o={this.state.o} arr={this.state.arr}>Child</Child>
+          <MemoChild count={this.state.count} o={this.state.o} arr={this.state.arr}>MemoChild</MemoChild>
+          <MemoChildCompare count={this.state.count} o={this.state.o} arr={this.state.arr}>MemoChildCompare</MemoChildCompare>
+        </div>
+      )
+    }
+  }
+
+  const Child = (props) => {
+    return (
+      <div>
+        <h6>{props.children}</h6>
+        <div>count: {props.count} | age: {props.o.age} | arr: {JSON.stringify(props.arr)}</div>
+      </div>
+    )
+  }
+
+  const MemoChild = memo(Child)     // 默认areEqual回调返回浅比较结果
+  const MemoChildCompare = memo(Child, areEqual)
+
+  /**
+   * 浅比较函数，返回是否相等，为false则更新
+   * @param prevP
+   * @param newP
+   * @returns {boolean}
+   */
+  function areEqual(prevP, newP) {
+    const prevValKeys = Object.keys(prevP)
+    const newValKeys = Object.keys(newP)
+    if (prevValKeys.length !== newValKeys.length) { return false }
+    return prevValKeys.every(prevValKey => newValKeys.indexOf(prevValKey) > -1 && prevP[prevValKey] === newP[prevValKey])
+  }
+
+  const App = () => {
+    return (
+      <Parent></Parent>
+    )
+  }
+
+  ReactDOM.render(<Parent/>, document.getElementById('example'))
+</script>
+</body>
+</html>

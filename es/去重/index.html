@@ -9,26 +9,31 @@
   // https://segmentfault.com/a/1190000016418021?utm_source=tag-newest
 
   // 利用ES6 Set去重
-  // function unique (arr) {
-  //   return Array.from(new Set(arr))
-  // }
+  function unique1(arr) {
+    return Array.from(new Set(arr))
+    // (13) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+    // {}没有去重
+  }
 
   // 利用for嵌套for，然后splice去重
-  // function unique(arr) {
-  //   for (var i = 0; i < arr.length; i++) {
-  //     for (var j = i + 1; j < arr.length; j++) {
-  //       // if(arr[i]===arr[j]){         //第一个等同于第二个，splice方法删除第二个
-  //       if (Object.is(arr[i], arr[j])) {         //第一个等同于第二个，splice方法删除第二个
-  //         arr.splice(j, 1);
-  //         j--;
-  //       }
-  //     }
-  //   }
-  //   return arr;
-  // }
+  function unique1(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      for (var j = i + 1; j < arr.length; j++) {
+        //第一个等同于第二个，splice方法删除第二个
+        // if(arr[i]===arr[j]){
+        // (14) [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]  // NaN、{}没去重
+        if (Object.is(arr[i], arr[j])) {
+          // (13) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]   // {}没去重
+          arr.splice(j, 1);
+          j--;
+        }
+      }
+    }
+    return arr;
+  }
 
   // 三、利用indexOf去重
-  function unique(arr) {
+  function unique1(arr) {
     if (!Array.isArray(arr)) {
       console.log('type error!')
       return
@@ -40,10 +45,12 @@
       }
     }
     return array;
+    // (14) [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]
+    // NaN {}没去重
   }
 
   // 四、利用sort()
-  function unique(arr) {
+  function unique1(arr) {
     if (!Array.isArray(arr)) {
       console.log('type error!')
       return;
@@ -51,43 +58,90 @@
     arr = arr.sort()
     var arrry = [arr[0]];
     for (var i = 1; i < arr.length; i++) {
-      if (arr[i] !== arr[i - 1]) {
+      // if (arr[i] !== arr[i - 1]) {     // (14) [0, 1, 15, NaN, NaN, "NaN", {…}, {…}, "a", false, null, "true", true, undefined]
+      if (!Object.is(arr[i], arr[i - 1])) { // (13) [0, 1, 15, NaN, "NaN", {…}, {…}, "a", false, null, "true", true, undefined]
         arrry.push(arr[i]);
       }
     }
     return arrry;
   }
 
-  function unique(arr) {
+  function unique1(arr) {
     if (!Array.isArray(arr)) {
       console.log('type error!')
       return
     }
-    var array =[];
-    for(var i = 0; i < arr.length; i++) {
-      if( !array.includes( arr[i]) ) {//includes 检测数组是否有某个值
+    var array = [];
+    for (var i = 0; i < arr.length; i++) {
+      if (!array.includes(arr[i])) {//includes 检测数组是否有某个值
         array.push(arr[i]);
       }
     }
     return array
+    // (13) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+    // {}没去重
   }
 
-  function unique(arr) {
+  function unique1(arr) {
     var obj = {};
-    return arr.filter(function(item, index, arr){
+    return arr.filter(function (item, index, arr) {
+      console.log(item, typeof item, typeof item + item)
       return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
     })
+    // (12) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}]
+    // 【所有都去重了】
   }
 
+  // 利用递归去重
+  function unique1(arr) {
+    var array = arr;
+    var len = array.length;
+
+    array.sort(function (a, b) {   //排序后更加方便去重
+      return a - b;
+    })
+
+    function loop(index) {
+      if (index >= 1) {
+        if (array[index] === array[index - 1]) {
+          array.splice(index, 1);
+        }
+        loop(index - 1);    //递归loop，然后数组去重
+      }
+    }
+
+    loop(len - 1);
+    return array;
+    // (14) [1, "true", false, null, 0, true, 15, NaN, NaN, "NaN", "a", {…}, {…}, undefined]
+    // NaN {}没去重
+  }
+
+  function unique1(arr) {
+    let map = new Map();
+    let array = new Array();  // 数组用于返回结果
+    for (let i = 0; i < arr.length; i++) {
+      if (map.has(arr[i])) {  // 如果有该key值
+        map.set(arr[i], true);
+      } else {
+        map.set(arr[i], false);   // 如果没有该key值
+        array.push(arr[i]);
+      }
+    }
+    return array;
+    // (13) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+    // {}没去重
+  }
+
+  // 利用reduce+includes
   function unique(arr) {
-    return arr.filter(function(item, index, arr) {
-      //当前元素，在原始数组中的第一个索引==当前索引值，否则返回当前元素
-      return arr.indexOf(item, 0) === index;
-    });
+    return arr.reduce((prev, cur) => prev.includes(cur) ? prev : [...prev, cur], []);
+    // (13) [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+    // {}没去重
   }
 
   var arr = [1, 1, 'true', 'true', true, true, 15, 15, false, false, undefined, undefined, null, null, NaN, NaN, 'NaN', 0, 0, 'a', 'a', {}, {}];
   console.log(unique(arr))
+
 </script>
 </body>
 </html>

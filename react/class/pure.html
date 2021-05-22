@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PureComponent</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  const {Component, PureComponent} = React
+
+  class Parent extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {count: 0, o: {age: 1}, arr: [1]}
+      this.addCount = this.addCount.bind(this)
+      this.addAge = this.addAge.bind(this)
+      this.addArr = this.addArr.bind(this)
+    }
+
+    addCount() {
+      this.setState(prevS => {
+        return {
+          ...prevS,
+          count: prevS.count + 1
+        }
+      })
+    }
+
+    addAge() {
+      this.setState(prev => {
+        prev.o.age += 1
+        return {
+          ...prev,
+          // o: {  // 新旧引用不一样，子组件的浅比较返回false
+          //   age: prev.o.age + 1
+          // }
+          o: prev.o // 新旧引用一样，子组件的浅比较返回true
+        }
+      })
+    }
+
+    addArr() {
+      this.setState(prev => {
+        const arr = prev.arr
+        arr.push(1)
+        return {
+          ...prev,
+          arr: arr   // 新旧引用一样，子组件的浅比较返回true
+          // arr: [...arr] // 新旧引用不一样，子组件的浅比较返回false
+        }
+      })
+    }
+
+    render() {
+      const {count, o, arr} = this.state
+      return (
+        <div>
+          <div>count: {count} | age: {o.age} | arr: {JSON.stringify(arr)}</div>
+          <div>
+            <button onClick={this.addCount}>addCount</button>
+            <button onClick={this.addAge}>addAge</button>
+            <button onClick={this.addArr}>addArr</button>
+          </div>
+          <Child
+            count={this.state.count}
+            o={this.state.o}
+            arr={this.state.arr}
+          ></Child>
+        </div>
+      )
+    }
+  }
+
+  // class Child extends PureComponent {
+  class Child extends Component {
+    // 模拟 PureComponent，供Component使用
+    shouldComponentUpdate (nextProps, nextState) {
+      return !shallowEqual(this.props, nextProps) || !shallowEqual(this.state, nextState)
+    }
+
+    state = {
+      arr: [2],
+      count: 1,
+      o: {age: 1}
+    }
+    addCount() {
+      this.setState(prevS => {
+        return {
+          ...prevS,
+          count: prevS.count + 1
+        }
+      })
+    }
+
+    addAge() {
+      this.setState(prev => {
+        prev.o.age += 1
+        return {
+          ...prev,
+          o: prev.o     // 新旧引用一样，浅比较返回true
+          // o: {       // 新旧引用不一样，浅比较返回false
+          //   age: prev.o.age + 1
+          // }
+        }
+      })
+    }
+
+    addArr() {
+      this.setState(prev => {
+        const arr = prev.arr
+        arr.push(1)
+        return {
+          ...prev,
+          // arr: arr   // 新旧引用一样，浅比较返回true
+          arr: [...arr] // 新旧引用不一样，浅比较返回false
+        }
+      })
+    }
+    render () {
+      return (
+        <div>
+          <h6>Child</h6>
+          <div>count: {this.props.count} | age: {this.props.o.age} | arr: {JSON.stringify(this.props.arr)}</div>
+          <div>my count: {this.state.count} | my age: {this.state.o.age} | my arr: {JSON.stringify(this.state.arr)}</div>
+          <div>
+            <button onClick={this.addCount.bind(this)}>addCount</button>
+            <button onClick={this.addAge.bind(this)}>addAge</button>
+            <button onClick={this.addArr.bind(this)}>addArr</button>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  /**
+   * 浅比较函数，返回是否相等，为false则更新
+   * @param prevVal
+   * @param newVal
+   * @returns {boolean}
+   */
+  function shallowEqual (prevVal, newVal) {
+    const prevValKeys = Object.keys(prevVal)
+    const newValKeys = Object.keys(newVal)
+
+    if (prevValKeys.length !== newValKeys.length) { return false }
+    // return prevValKeys.every(prevValKey => newValKeys.indexOf(prevValKey) > -1 && prevVal[prevValKey] === newVal[prevValKey])
+    return prevValKeys.every(prevValKey => {
+      const equal = prevVal[prevValKey] === newVal[prevValKey]
+      console.log(prevValKey, equal, prevVal[prevValKey], newVal[prevValKey])
+      return newValKeys.indexOf(prevValKey) > -1 && equal
+    })
+  }
+
+  const App = () => {
+    return (
+      <Parent></Parent>
+    )
+  }
+
+  ReactDOM.render(<Parent/>, document.getElementById('example'))
+</script>
+</body>
+</html>

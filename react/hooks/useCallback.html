@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>useCallback</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  const {useState, useEffect, useCallback} = React
+  const App = () => {
+    const [count, setCount] = useState(0);
+
+    // 使用 useCallBack 缓存
+    const handleCountAddByCallBack = useCallback(() => {
+      setCount((count) => count + 1);
+    }, []); // 依赖项为空，则不会触发
+
+    // 不缓存，每次 count 更新时都会重新创建
+    const handleCountAdd = () => {
+      setCount((count) => count + 1);
+    };
+
+    return (
+      <div className="App">
+        <h3>CountAddByChild1: {count}</h3>
+        <Child1 addByCallBack={handleCountAddByCallBack} add={handleCountAdd} />
+      </div>
+    );
+  }
+
+  const Child1 = React.memo(function (props) {
+    const { add, addByCallBack } = props;
+
+    // 没有缓存，由于每次都创建，memo 认为两次地址都不同，属于不同的函数，所以会触发 useEffect
+    useEffect(() => {
+      console.log("Child1----addFcUpdate", props);
+    }, [add]);
+
+    // 有缓存，memo 判定两次地址都相同，所以不触发 useEffect
+    useEffect(() => {
+      console.log("Child1----addByCallBackFcUpdate", props);
+    }, [addByCallBack]);
+
+    return (
+      <div>
+        <button onClick={props.add}>+1</button>
+        <br />
+        <button onClick={props.addByCallBack}>+1(addByCallBack)</button>
+      </div>
+    );
+  });
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

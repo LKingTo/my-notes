@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义事件</title>
+    <div id="btn">button</div>
+</head>
+<body>
+
+</body>
+<script>
+    let btn = document.querySelector('#btn')
+
+    /**
+     * 1、new Event(type, {bubbles, cancelable, composed})
+     */
+    let alertEvent = new Event('alert', {
+      bubbles: true,
+      cancelable: true,
+    })
+    btn.addEventListener('alert', (e) => {
+      console.log(e.bubbles)    // true
+      console.log(e.cancelable) // true
+      console.log(e.detail) // undefined,获取不了event.detail
+    })
+    btn.dispatchEvent(alertEvent)
+
+    /**
+     * 2、createEvent('CustomEvent')方式，已废弃
+     */
+    // let ev = btn.createEvent('CustomEvent')
+    // ev.initCustomEvent('alert1', true, true, 'button')
+    // btn.addEventListener('alert1', (e) => {
+    //   console.log(e.bubbles)    // true
+    //   console.log(e.cancelable) // true
+    //   console.log(e.detail)     // button
+    // }, false)
+    // btn.dispatchEvent(ev)
+
+    /**
+      * 3、@type {CustomEvent<{data: string}>}
+     */
+    let cEv = new CustomEvent('bug', {detail: {data: 'null is not a function'}})
+    btn.addEventListener('bug', (e) => {
+      console.log(e.bubbles)    // false
+      console.log(e.cancelable) // false
+      console.log(e.detail.data)     // 'null is not a function'
+    }, {
+      once: true    // 只执行一次，即remove
+    })
+    btn.dispatchEvent(cEv)
+    btn.dispatchEvent(cEv)  // 无触发
+
+
+    /**
+     * 4、非DOM事件，EventTarget类
+     */
+    class MyCustomEvent {
+      constructor() {
+      }
+      listeners = {}
+      $add(type, handler) {
+        const listeners = this.listeners[type]
+        if (!listeners || !Array.isArray(listeners)) {
+          this.listeners[type] = []
+        }
+        this.listeners[type].push(handler)
+      }
+      $emit(type) {
+        if (this.listeners[type]) {
+          this.listeners[type].forEach(fn => {
+            fn()
+          })
+        }
+      }
+      $remove(type, handler) {
+        if (this.listeners[type]) {
+          if (handler) {
+            let targetIndex = this.listeners[type].findIndex(fn => fn === handler)
+            if (targetIndex > -1) {
+              this.listeners[type].splice(targetIndex, 1)
+            }
+          } else {
+            this.listeners[type] = []
+          }
+        }
+      }
+    }
+
+    function myNew(cons, args) {
+      let obj = {}
+      obj.__proto__ = cons.prototype
+      let result = cons.call(obj, args)
+      return result instanceof Object ? result : obj
+    }
+
+    function Animal(name) {
+      this.name = name;
+    }
+    Animal.prototype.say = function() {
+      console.log('name:', this.name)
+    }
+
+    let a = myNew(Animal, 'cat')
+    a.say()
+    let b = new Animal('dog')
+    b.say()
+    console.log(a)
+    console.log(b)
+</script>
+</html>

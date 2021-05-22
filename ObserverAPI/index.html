@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Observer API</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="root">
+<!--<h3></h3>-->
+<div class="compare">
+    <h3>Observer是浏览器自带的观察者,它主要提供了Intersection, Mutation, Resize, Performance这四类观察者</h3>
+    <p>compare</p>
+</div>
+<ul class="list">
+    <li class="item item-1">1</li>
+    <li class="item item-2">2</li>
+    <li class="item item-3">3</li>
+    <li class="item item-4">4</li>
+    <li class="item item-5">5</li>
+    <li class="item item-6">6</li>
+    <li class="item item-7">7</li>
+    <li class="item item-8">8</li>
+    <li class="item item-9">9</li>
+</ul>
+<script>
+  const clientHeight = window.innerHeight
+  // 定义观察者及观察回调
+  const interObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        console.log(entry.target, entry)
+      })
+    },
+    // 观察者本身设置
+    {
+      // root: document.querySelector('body'),    // 必须为目标元素的父元素
+      // rootMargin: `${clientHeight - 300}px`,  //
+      thresholds: 1
+    }
+  )
+
+  // 定义观察目标，调用api .observer()
+  const targets = Array.from(document.querySelectorAll('li.item')).forEach(target => {
+    interObserver.observe(target)
+  })
+</script>
+</body>
+</html>

@@ -34,9 +34,10 @@
       set: function(target, key, newValue, receiver) {
         // console.log('set receiver', receiver)
         console.log('set new', newValue);
-        target[key] = newValue;
+        // watcher监听处理省略
+        let res = Reflect.set(target, key, newValue);   // 对Array api会触发两次(若有返回值)，第二次为api返回值
         self.render();
-        return true;
+        return res;
       }
     })
   }
@@ -48,8 +49,7 @@
     console.log('render')
     document.querySelector('.title').innerHTML = 'title: ' + this.$data.title;
     document.querySelector('.text').innerHTML = 'text: ' + this.$data.text;
-    if (this.$data.arr)
-        document.querySelector('.arr').innerHTML = 'arr: ' + this.$data.arr.join(',');
+    document.querySelector('.arr').innerHTML = 'arr: ' + JSON.stringify(this.$data.arr);
     document.querySelector('.obj').innerHTML = 'obj: ' + JSON.stringify(this.$data.o);
     document.querySelector('.data').innerHTML = 'data: ' + JSON.stringify(this.$data);
   }
@@ -63,8 +63,12 @@
       b: {arr: [1, 2, 3]},
     }
   };
-  data = [];
+  // $data.arr.push(2) 只修改了原始对象，代理对象无触发修改
+  // $data.o.c = 88 只修改了原始对象，代理对象无触发修改
+
+  // data = [];    // 直接调用Array api能触发，而且触发两次
   var myVue = new vue(data);
+  window.$data = myVue.$data
 
 </script>
 </html>
