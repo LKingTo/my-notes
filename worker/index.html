@@ -26,6 +26,7 @@
 <script>
   function createWorker(el) {
     // 创建一个同页面的web worker
+    // Blob 对象表示一个不可变、原始数据的类文件对象
     const blob = new Blob([document.querySelector(el).textContent]);
     const url = window.URL.createObjectURL(blob);
     return new Worker(url);

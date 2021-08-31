@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>useEffect</title>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+<!--    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>-->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+  const {useEffect, useState, useRef} = React
+
+  const Child = (props) => <div>{props.total}</div>
+  const App = () => {
+    const [count, setCount] = useState(0);
+    const [total, setTotal] = useState(0);
+    const totalRef = useRef(total);
+
+    // let total = 0
+    useEffect(() => {
+      // total = count * 2
+      // totalRef.current = count * 2
+      setTotal(count * 2)    // 因为更改了total，会再次触发一次渲染
+      totalRef.current = totalRef.current * 2 || count * 2  // 不会触发再次渲染
+      console.log('create: ', count, total, totalRef.current)
+      return () => {
+        console.log('destroy: ', count, total, totalRef.current)  // 上一次引用的值
+        setTotal(count / 2)
+        // setTotal(total => total / 2)
+        // totalRef.current = count / 2
+        // totalRef.current = totalRef.current / 2
+      }
+    }, [count])
+    return (
+      <div className="App">
+        <h2>App</h2>
+        <h5>count: {count} total: {total} totalRef: {totalRef.current}</h5>
+        <Child total={total}/>
+        <button
+          onClick={() => {
+            setCount((count) => count + 1);
+          }}
+        >
+          Add Count
+        </button>
+      </div>
+    );
+  }
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

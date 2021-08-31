@@ -15,7 +15,7 @@
     const [count, setCount] = useState(0);
     const [total, setTotal] = useState(0);
 
-    // 没有使用 useMemo，即使是更新 total, countToString 也会重新计算
+    // 没有使用 useMemo，即只是更新 total, countToString 也会重新计算
     const countToString = (() => {
       console.log("countToString 被调用");
       return count.toString();

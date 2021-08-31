@@ -19,16 +19,16 @@ function lis(arr) {
   return Math.max(...dp)
 }
 
-console.log('lis', lis([10, 9, 2, 4, 3, 8, 7, 13]))
-console.log('lis', lis1([10, 9, 2, 4, 3, 8, 7, 13]))
+console.log('lis', lis([10, 9, 2, 4, 3, 8, 7, 13])) // 4
+console.log('lis', lis1([10, 9, 2, 4, 3, 8, 7, 13]))   // [2,3,5,7] => [2,4,8,13]
 
 
 function lis1(arr) {
   let len = arr.length,
     res = [],
-    dp = new Array(len).fill(1);  // [1,1,...]
+    dp = new Array(len).fill(1);  // 记录每个索引作为起始索引的递增长度，初始都为1：[1,1,...]
   for (let i = 0; i < len; i++) {
-    res.push([i])   // [[0],[1],[2],...]
+    res.push([i])   // 记录各个（索引）递增序列：[[0],[1],[2],...]
   }
   for (let i = len - 1; i >= 0; i--) {
     let cur = arr[i],       // [13] [7]...
@@ -48,7 +48,7 @@ function lis1(arr) {
     if (nextIndex !== undefined)
       res[i].push(...res[nextIndex])
   }
-  console.log('res', res)
+  console.log('res', res, dp)
   let index = dp.reduce((prev, cur, i, arr) => cur > arr[prev] ? i : prev, dp.length - 1)  // 返回最长的递增子序列的index
   return res[index]
 }

@@ -59,7 +59,7 @@ function foo4() {
 }
 
 // 5、promise里同时出现setImmediate、setTimeout
-// promise不在node的eventLoop任意阶段，但在一阶段结束后立即执行
+// promise不在node的eventLoop任意阶段，但在任一阶段结束后立即执行
 function foo5() {
   new Promise(resolve => {
     resolve()
@@ -116,5 +116,6 @@ function fooM3(isTick) {
 
 // fooM1(true)
 // fooM2(true)
-fooM3(true)
+// fooM3(true)
+fooM3()
 
