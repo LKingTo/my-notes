@@ -16,6 +16,7 @@
 
     // 使用 useCallBack 缓存
     const handleCountAddByCallBack = useCallback(() => {
+      console.log('run useCallback')
       setCount((count) => count + 1);
     }, []); // 依赖项为空，则不会触发
 

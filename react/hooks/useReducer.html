@@ -34,9 +34,10 @@
     )
   }
   const Child = () => {
-    const dispatch = useContext(CountContext)
+    const {state, dispatch} = useContext(CountContext)
     return (
       <div>
+        <h6>Child count: {state.count}</h6>
         <button onClick={() => dispatch({type: 'increment'})}>increment</button>
         <button onClick={() => dispatch({type: 'decrement'})}>decrement</button>
       </div>
@@ -48,8 +49,8 @@
     // 用useReducer、useContext配合，替代函数prop深度传递
     return (
       <div>
-        <h4>{state.count}</h4>
-        <CountContext.Provider value={dispatch}>
+        <h4>App count: {state.count}</h4>
+        <CountContext.Provider value={{state, dispatch}}>
           <Parent/>
         </CountContext.Provider>
       </div>

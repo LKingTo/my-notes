@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>合成事件</title>
+    <script src="https://cdn.staticfile.org/react/16.12.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+<script type="text/babel">
+
+  document.addEventListener('click', (e) => {
+    console.log('1st document');
+  })
+
+  const {Component} = React
+
+  class App extends Component {
+    // 点击div.child元素，以下排除阻止冒泡的操作，正常触发顺序：
+    // dom child => 'dom child 2nd' => dom parent => body => 1st document =>
+    // [react child] => [react parent] => document => window
+
+    componentDidMount() {
+      this.parent.addEventListener('click', (e) => {
+        console.log('dom parent', e);
+      })
+      this.child.addEventListener('click', (e) => {
+        console.log('dom child', e);
+        // e.stopPropagation()     // 原生事件先于合成事件完成，故阻止了后续所有冒泡，'dom child 2nd'除外
+        // e.stopImmediatePropagation()     // 阻止了后续所有冒泡，包括 'dom child 2nd'
+      })
+      this.child.addEventListener('click', (e) => {
+        console.log('dom child 2nd', e);
+      })
+
+      document.addEventListener('click', (e) => {
+        // 因为render阶段先于DidMount阶段，所以合成事件的[react child]、[react parent]先于document触发
+        console.log('document');
+      })
+      document.body.addEventListener('click', (e) => {
+        console.log('body');
+      })
+      window.addEventListener('click', (e) => {
+        console.log('window');
+      })
+    }
+
+    parentClick(e) {
+      console.log('[react parent]', e)
+    }
+
+    childClick(e) {
+      console.log('[react child]', e)
+      const syntheticEvent = e      // 合成事件对象
+      const nativeEvent = e.nativeEvent  // 原生事件对象
+
+      // 出于性能考虑，合成事件对象会被重用，默认所有事件回调执行后，对象属性无法异步访问
+      // 调用.persist()，可保留对事件的引用，但React17版本开始不再支持改方法
+      syntheticEvent.persist()
+
+      syntheticEvent.stopPropagation()   // 实际执行了原生stopImmediatePropagation，既阻止向上的window，也阻止同级后续的[react parent]
+
+      // syntheticEvent.stopImmediatePropagation()   // 合成事件没有封装stopImmediatePropagation，不支持，报错
+
+      // nativeEvent.stopPropagation()     // 阻止原生事件的向上，window无法触发
+
+      // nativeEvent.stopImmediatePropagation()     // 既阻止原生事件的向上，也阻止当前节点的后续事件，document、window无法触发
+    }
+
+    childClick2(e) {
+      console.log('[react child 2nd]', e)
+    }
+
+    render() {
+      return (
+        <div className='parent' onClick={this.parentClick} ref={ref => this.parent = ref}>
+          {/* 同一事件类型只保留一个，后者覆盖前者 */}
+          {/* <div className='child' onClick={this.childClick} onClick={this.childClick2} ref={ref => this.child = ref}> */}
+          <div className='child' onClick={this.childClick} ref={ref => this.child = ref}>
+            Click me!
+          </div>
+        </div>
+      )
+    }
+  }
+
+  // class App2 extends Component {
+  //
+  //   clickApp(e) {
+  //     console.log('[react App2]', e)
+  //     e.stopPropagation()
+  //   }
+  //
+  //   render() {
+  //     return (
+  //       <div className='parent' onClick={this.clickApp}>
+  //         Click App2!
+  //       </div>
+  //     )
+  //   }
+  // }
+
+  ReactDOM.render(<App/>, document.getElementById('example'))
+</script>
+</body>
+</html>

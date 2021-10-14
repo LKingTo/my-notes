@@ -17,13 +17,13 @@
 
     // 没有使用 useMemo，即只是更新 total, countToString 也会重新计算
     const countToString = (() => {
-      console.log("countToString 被调用");
+      console.log("countToString 被调用", count);
       return count.toString();
     })();
 
     // 使用了 useMemo, 只有 total 改变，才会重新计算
     const totalToStringByMemo = useMemo(() => {
-      console.log("totalToStringByMemo 被调用");
+      console.log("totalToStringByMemo 被调用", total);
       return total + "";
     }, [total]);
 
