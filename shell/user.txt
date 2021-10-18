@@ -1,0 +1,6 @@
+daokr#cat user.txt
+ID    Name    Sex    Age
+1    zhang    M    19
+2    wang    G    20
+3    cheng    M    10
+4    huahua    M    100
