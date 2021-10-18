@@ -15,7 +15,6 @@ type obj = {
   b: number
 }
 type ccc = GetOnlyFnProps<obj>
-
 let value: ccc = {
   a: () => '1',
 }
@@ -34,3 +33,23 @@ type UnGenericPromise<T> = T extends Promise<infer R> ? R : T
 
 const resStatus: UnGenericPromise<Promise<number>> = 404
 
+type OA = 'TOTO' | 'JACKY' | 'JILL'
+type MS = Record<OA, {age: number}>
+const ms: MS = {
+  TOTO: {age: 20},
+  JACKY: {age: 20},
+  JILL: {age: 20},
+}
+
+type T1 = {
+  a: number,
+  o: [],
+  c: null
+}
+type T2 = {
+  b: number,
+  o: []
+}
+type T12 = Exclude<T1, T2>
+type T121 = Extract<T1, T2>
+type T3 = NonNullable<T1>

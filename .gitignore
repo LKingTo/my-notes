@@ -1,2 +1,4 @@
 .DS_Store
-/typescript/ajax/node_modules/
+node_modules
+esbuild/dist/
+t.js
