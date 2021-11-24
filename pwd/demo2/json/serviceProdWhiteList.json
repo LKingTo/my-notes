@@ -1,0 +1,28 @@
+{
+  "key": "serviceProdWhiteList",
+  "value": null,
+  "note": "投顾智选产品白名单",
+  "others": [
+    {
+      "strategyName": "广发聚金盆瑞雪天成",
+      "clientId": "183100026316",
+      "clientName": "何瑞斌",
+      "updateAt": 1578646351388,
+      "strategyId": "assetAdvisor.wealthBowlRxtc"
+    },
+    {
+      "strategyName": "广发聚金盆财富人生",
+      "clientId": "050500029338",
+      "clientName": "刘子成",
+      "updateAt": 1583209945641,
+      "strategyId": "assetAdvisor.wealthBowlCfrs"
+    },
+    {
+      "strategyName": "广发聚金盆涧底松",
+      "clientId": "120412107159",
+      "clientName": "李庆铮",
+      "updateAt": 1578646448460,
+      "strategyId": "assetAdvisor.wealthBowlJds"
+    }
+  ]
+}

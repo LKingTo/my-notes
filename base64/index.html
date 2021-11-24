@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base64</title>
+</head>
+<body>
+<script>
+  /**
+   * FileReader
+   * readAsDataURL() 把上传的文件转为base64格式的data URI
+   * @returns {Promise<unknown>}
+   */
+  async function readAsDataURL() {
+    const fileEl = document.getElementById("inputFile");
+    return new Promise((resolve, reject) => {
+      const fd = new FileReader();
+      fd.readAsDataURL(fileEl.files[0]);
+      fd.onload = function () {
+        resolve(fd.result);
+        // data:image/png;base64,iVBORw0KGgoAAAA.......
+      }
+      fd.onerror = reject;
+    });
+  }
+
+  const code = "a".charCodeAt(0)
+</script>
+</body>
+</html>

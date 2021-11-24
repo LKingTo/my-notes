@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PWD</title>
+</head>
+<body>
+<div>
+    <button id="btn">submit</button>
+    <div>
+        <input id="text" type="text">
+        <button id="msg">post</button>
+    </div>
+    <p id="result"></p>
+</div>
+<script src="js/simpleEvent.js"></script>
+<script>
+  const simpleEvent = new SimpleEvent()
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').then(reg => {
+        reg.installing; // the installing worker, or undefined
+        reg.waiting; // the waiting worker, or undefined
+        reg.active; // the active worker, or undefined
+
+        reg.addEventListener('updatefound', () => {
+          // 当一个service worker安装时触发
+          const newWorker = reg.installing;
+
+          newWorker.state;
+          // "installing" 安装事件已经触发，但尚未完成
+          // "installed" 安装完成
+          // "activating" 激活事件已经触发，但还没有完成
+          // "activated" 激活完成
+          // "redundant" 丢弃。要么是安装失败，要么被新版本取代。
+
+          newWorker.addEventListener('statechange', () => {
+            // newWorker.state 变化时
+            console.log('newWorker.state: ', newWorker.state)
+          });
+        });
+      });
+
+      // navigator.serviceWorker.addEventListener('controllerchange', (e) => {
+      //   // 当service worker管控页面时触发
+      //   console.log('controllerchange', e)
+      // });
+
+      // 监听后台postMessage事件
+      navigator.serviceWorker.addEventListener('message', e => {
+        const {type, msg: data} = e.data
+        simpleEvent.trigger(type, data)
+      })
+
+      document.getElementById('btn').addEventListener('click', e => onClickBtn(e))
+
+      document.getElementById('msg').addEventListener('click', e => onClickMsg(e))
+    })
+  }
+
+  // setTimeout(() => {
+  //   const img = new Image();
+  //   img.src = './img/haiReng.png';
+  //   document.body.appendChild(img);
+  //   setTimeout(() => {
+  //     const img = new Image();
+  //     img.src = './img/qingNiao.png';
+  //     document.body.appendChild(img);
+  //   });
+  // }, 3000);
+
+  setTimeout(() => {
+    const url = 'https://robot.gf.com.cn/api/robot/investment/2.0.0/others/settings/serviceProdWhiteList'
+    fetch(url, {mode: 'no-cors'}).then(async res => {
+      if (res.ok && res.status !== 404) {
+        const data = await res.json()
+        console.log('[client fetch:]', data)
+      }
+    })
+  }, 3000)
+
+  const onClickBtn = (event) => {
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then(reg => {
+        const type = 'sync-click-btn'
+        const tag = JSON.stringify({type, msg: {id: 'button'}})
+        // 注册sync事件
+        reg.sync.register(tag).then(() => {
+          console.log('[btn sync已注册: ]', tag)
+
+          navigator.serviceWorker.controller.postMessage({action: 'sync', type})
+
+          // 最终获取后台postMessage的数据
+          simpleEvent.once(type, async res => {
+            console.log('[client response: ]', res)
+          })
+        }).catch(err => {
+          console.log('[btn sync注册失败: ]', err)
+        })
+      })
+    } else {
+      // fetch on client...
+    }
+  }
+
+  const onClickMsg = (event) => {
+    const value = document.getElementById('text').value
+    if ('serviceWorker' in navigator) {
+      const msgChan = new MessageChannel()
+      const {port1, port2} = msgChan
+      const action = 'computed'
+      // 向后台发送message
+      navigator.serviceWorker.controller.postMessage({action, value}, [port2])
+      // 监听后台message
+      port1.onmessage = msg => {
+        console.log('[port1 onmessage: ]', msg)
+        document.getElementById('result').innerHTML = msg.data
+      }
+    } else {
+      // ...
+    }
+  }
+
+</script>
+</body>
+</html>

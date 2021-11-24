@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PWD</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <link href="https://cdn.gfzq.cn/robot/fima/css/app.de6932b0.css" rel="stylesheet">
+</head>
+<body>
+<script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        console.log('load')
+        navigator.serviceWorker.register('./service-worker.js').then(reg => {
+          reg.installing; // the installing worker, or undefined
+          reg.waiting; // the waiting worker, or undefined
+          reg.active; // the active worker, or undefined
+
+          reg.addEventListener('updatefound', () => {
+            // 当一个service worker安装时触发
+            const newWorker = reg.installing;
+
+            newWorker.state;
+            // "installing" 安装事件已经触发，但尚未完成
+            // "installed" 安装完成
+            // "activating" 激活事件已经触发，但还没有完成
+            // "activated" 激活完成
+            // "redundant" 丢弃。要么是安装失败，要么被新版本取代。
+
+            newWorker.addEventListener('statechange', () => {
+              // newWorker.state 变化时
+              console.log('newWorker.state: ', newWorker.state)
+            });
+          });
+        });
+
+        navigator.serviceWorker.addEventListener('controllerchange', (e) => {
+          // 当service worker管控页面时触发
+          console.log('controllerchange', e)
+        });
+      })
+    }
+</script>
+<script src="https://unpkg.com/vue@next"></script>
+<script src="./js/index.js"></script>
+</body>
+</html>
