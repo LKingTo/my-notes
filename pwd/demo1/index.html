@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>PWD</title>
+    <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./css/index.css">
     <link href="https://cdn.gfzq.cn/robot/fima/css/app.de6932b0.css" rel="stylesheet">
 </head>
 <body>
+<h1>PWA DEMO1</h1>
 <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -40,8 +42,69 @@
         });
       })
     }
+
+    function loadJs(url) {
+      return new Promise((resolve, reject) => {
+        if (!url) {
+          resolve(-1)
+          return
+        }
+        const script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.async = 'async'
+        script.src = url
+        let loaded = false
+        if ('onload' in script) {
+          script.onload = function () {
+            if (!loaded) {
+              loaded = true
+              resolve(0)
+            }
+          }
+        } else {
+          script.onreadystatechange = function () {
+            if (loaded) {
+              return
+            }
+            if (this.readyState === 'complete' || this.readyState === 'loaded') {
+              loaded = true
+              resolve(0)
+            }
+          }
+        }
+        script.onerror = function () {
+          if (!loaded) {
+            loaded = true
+            headElm.removeChild(script)
+            reject()
+          }
+        }
+        const headElm =
+          document.head || document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]
+        headElm.appendChild(script)
+      })
+    }
+
+    // setTimeout(() => {
+      // loadJs('https://unpkg.com/vue@next')
+      // loadJs('https://cdn.gfzq.cn/robot/fima/uat/js/chunk-vendors.6c4e75cf.js')
+      // fetch('https://cdn.gfzq.cn/robot/fima/uat/css/chunk-77c57bcf.9f235b5d.css', {mode: 'no-cors'})
+    // }, 5000)
+
+    const url = 'https://cdn.gfzq.cn/robot/fima/uat/img/org-banner.7c01a301.jpg'
+    setTimeout(() => {
+      fetch(url, {mode: 'no-cors'})
+      fetch('https://dss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/topnav/baiduyun@2x-e0be79e69e.png', {mode: 'no-cors'})
+    }, 5000)
+
+    // setTimeout(() => {
+    //   const img = new Image();
+    //   img.src = url;
+    //   document.body.appendChild(img);
+    // }, 5000);
+
 </script>
-<script src="https://unpkg.com/vue@next"></script>
+<!--<script src="https://unpkg.com/vue@next"></script>-->
 <script src="./js/index.js"></script>
 </body>
 </html>
